@@ -1,0 +1,4 @@
+
+Install redis, you will need it later.
+
+Install zeromq 3.1, then do cabal install <package name> for every package in the cabal.requirements.txt file.
