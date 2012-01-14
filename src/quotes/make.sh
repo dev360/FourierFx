@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ghc -o bin/quotes QuoteServer.hs
+ghc -o bin/quoteserver QuoteServer.hs

@@ -1,4 +1,55 @@
 
-Install redis, you will need it later.
+ REQUIREMENTS
+==============
 
-Install zeromq 3.1, then do cabal install <package name> for every package in the cabal.requirements.txt file.
+1.  ZeroMQ
+
+    Low-level library to build a messaging framework or client/server.
+
+    Install it from source and install some pre-reqs:
+
+    $ sudo apt-get install libtool uuid-dev autoconf automake 
+    $ curl http://download.zeromq.org/zeromq-3.1.0-beta.tar.gz > zeromq.tar.gz
+    $ tar -xzf zeromq.tar.gz
+    $ cd zeromq-3.1.0
+    $ ./configure
+    $ make
+    $ make install
+
+    On OSX, you just need to install ossp-uuid with brew.
+
+2.  Haskell
+  
+    Runs the server
+
+    Just get the latest version which comes bundled with cabal. Afaik version doesnt matter.
+
+    $ sudo apt-get update
+    $ sudo apt-get install ghc
+
+3.  Redis
+
+    Will be used to store quotes in.
+
+   $ sudo apt-get update
+   $ sudo apt-get install redis
+
+
+ RUNNING THE CODE
+======================
+
+1.  Compiling and installing pre-reqs
+  
+    Run the following bash script to update Haskell requirements
+
+    $ cd src/qoutes
+    $ ./cabal-install.sh
+
+2.  Compile:
+
+    $ mkdir bin
+    $ ./make.sh
+
+3.  Run code:
+
+    $ ./bin/quotesserver tcp://127.0.0.1:8000
