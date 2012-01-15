@@ -24,6 +24,13 @@ main = do
         ZMQ.withSocket c ZMQ.Pub $ \s -> do
             ZMQ.bind s addr
             forever $ do
+                line <- SB.fromString <$> getLine
+                ZMQ.send s [] (SB.append name line)
+
+
+
+{-|
+
                 line <- SB.fromString <$> getLine `catch`
                     \e -> if isEOFError e then return "" 
                         else ioError e
@@ -32,3 +39,5 @@ main = do
                     ZMQ.send s [] (SB.append name line)
                 else
                     return ()                    
+
+|-}

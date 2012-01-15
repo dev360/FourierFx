@@ -52,4 +52,22 @@
 
 3.  Run code:
 
-    $ ./bin/quotesserver tcp://127.0.0.1:8000
+    Window 1:
+    $ ./bin/quote_publisher tcp://127.0.0.1:8000
+
+    Window 2:
+    $ ./bin/quote_subscriber tcp://127.0.0.1:8000
+
+    As you type in window 1, it will display in window 2.
+
+ NEXT STEPS
+============
+
+1.  Right now, we could probably fake having a tcp/ip stream of quotes that we 
+    listen to by just piping in a big text file of historical data to the publisher.
+
+    e.g.
+    
+    cat data.txt | ./bin/quote_publisher tcp://127.0.0.1:8000
+
+
