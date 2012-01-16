@@ -38,10 +38,11 @@ main = do
         ZMQ.withSocket c ZMQ.Pub $ \s -> do
             ZMQ.bind s addr
             forever $ do
-                line <- (SB.fromString <$> getLine')
-                sendMessage s name line
-
-
+                --line <- (SB.fromString <$> getLine)
+                --sendMessage s name line
+                line <- SB.fromString <$> getLine
+                when (line /= SB.fromString "") $ putStrLn $ SB.toString line
+                --sendMessage s name line
 
 
 {-|
