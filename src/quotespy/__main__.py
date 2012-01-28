@@ -1,10 +1,12 @@
 from __future__ import with_statement
 
 import csv
+from datetime import datetime
+from decimal import Decimal
 import sys, getopt
 
 from utils.unicodecsv import UnicodeReader
-from utils.zeromq import ZmqSocket
+from publisher import QuotePublisher
 
 
 def usage():
@@ -14,7 +16,7 @@ def usage():
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "file="])
+        opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "file=", "limit="])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -30,22 +32,45 @@ def main():
         'help' in kwargs.keys():
         usage()
 
-    
-    socket = ZmqSocket('tcp://127.0.0.1:6000', 'XPUB')
+    if 'limit' in kwargs.keys():
+        kwargs['limit'] = int(kwargs['limit'])
 
-    
+    server = QuotePublisher()
 
     if 'file' in kwargs.keys():
-        load_file(kwargs['file'], socket)
+
+        for quote in get_quotes(kwargs['file'], kwargs.get('limit', None)):
+            server.send(quote)
 
 
-def load_file(file_name, socket):
+def get_quotes(file_name, limit=None):
     """ Loads a file and sends each line of the file through a socket. """    
 
     reader = UnicodeReader(open(file_name, 'rb'), delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
+    n = 0
+
     for line in reader:
-        print line
+
+        if limit and  n > limit:
+            print "Retrieved {0} quotes.".format(limit)
+            return
+
+        n += 1
+
+        # First line is CSV header
+        if n == 1:
+            continue
+
+
+        quote = {}
+        quote['date'] = datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S")
+        quote['ask'] = Decimal(line[1])
+        quote['bid'] = Decimal(line[2])
+        quote['ask_volume'] = Decimal(line[3])
+        quote['bid_volume'] = Decimal(line[4])
+        print quote
+        yield quote
 
 
 if __name__ == "__main__":
