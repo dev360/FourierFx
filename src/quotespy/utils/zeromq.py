@@ -1,4 +1,5 @@
 import zmq
+from zmq.utils.strtypes import asbytes
 
 class ZmqSocket(object):
     """ Abstraction for a zero mq socket """
@@ -11,21 +12,41 @@ class ZmqSocket(object):
         }
 
         bind = kwargs.get('bind', True)
+        connect = kwargs.get('connect', True)
 
-        self.bind_to = args[0]
-        self.socket_type = socket_types[args[1].upper()]
+        str_socket_type = args[1].upper()
+
+        self.host = args[0]
+        self.socket_type = socket_types[str_socket_type]
 
         self.context = zmq.Context()
         self.socket = self.context.socket(self.socket_type)
 
-        if bind:
+        if self.socket_type == zmq.XPUB and bind:
             self.bind()
+
+        if self.socket_type == zmq.XSUB and connect:
+            self.connect()
 
     def bind(self):
         """ Binds the socket """
-        self.socket.bind(self.bind_to)
+        self.socket.bind(self.host)
+        print 'Binding to {0}'.format(self.host)
+
+    def connect(self):
+
+        self.socket.connect(self.host)
+        print 'Connected to {0}'.format(self.host)
+        #if self.socket_type == zmq.XSUB:
+            #self.socket.setsockopt(zmq.SUBSCRIBE, u''.encode('utf-8'))
+                    
+
+    def receive(self):
+        print 'receiving'
+        return self.socket.recv_pyobj()
+
 
     def send(self, message):
         """ Sends a message to the socket """
-        self.socket.send_pyobj(message)
+        self.socket.send_unicode(message)
 
