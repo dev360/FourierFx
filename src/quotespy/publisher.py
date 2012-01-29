@@ -5,6 +5,8 @@ from datetime import datetime
 from decimal import Decimal
 import sys, getopt
 
+import simplejson
+
 import settings
 
 from utils.unicodecsv import UnicodeReader
@@ -21,7 +23,8 @@ class QuotePublisher(object):
         super(QuotePublisher, self).__init__(*args, **kwargs)
 
     def send(self, quote):
-        self.socket.send(str(quote['bid']))
+        json = simplejson.dumps(quote)
+        self.socket.send(json)
 
 
 def publisher_usage():
@@ -89,7 +92,7 @@ def get_quotes(file_name, symbol, limit=None):
 
         quote = {}
         quote['symbol'] = symbol
-        quote['date'] = datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S")
+        quote['date'] = str(datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S"))
         quote['ask'] = Decimal(line[1])
         quote['bid'] = Decimal(line[2])
         quote['ask_volume'] = Decimal(line[3])
