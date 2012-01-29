@@ -16,7 +16,7 @@ def usage():
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "file=", "limit="])
+        opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "file=", "limit=", "symbol="])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -39,11 +39,15 @@ def main():
 
     if 'file' in kwargs.keys():
 
-        for quote in get_quotes(kwargs['file'], kwargs.get('limit', None)):
+        if 'symbol' not in kwargs.keys():
+            print 'You need to specify the ticker symbol with the symbol flag in order to process this file.'
+            sys.exit(2)
+
+        for quote in get_quotes(kwargs['file'], kwargs.get('symbol').upper(), kwargs.get('limit', None), ):
             server.send(quote)
 
 
-def get_quotes(file_name, limit=None):
+def get_quotes(file_name, symbol, limit=None):
     """ Loads a file and sends each line of the file through a socket. """    
 
     reader = UnicodeReader(open(file_name, 'rb'), delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -64,6 +68,7 @@ def get_quotes(file_name, limit=None):
 
 
         quote = {}
+        quote['symbol'] = symbol
         quote['date'] = datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S")
         quote['ask'] = Decimal(line[1])
         quote['bid'] = Decimal(line[2])
