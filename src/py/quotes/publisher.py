@@ -4,6 +4,7 @@ import csv
 from datetime import datetime
 from decimal import Decimal
 import sys, getopt
+import time
 
 import simplejson
 
@@ -62,6 +63,8 @@ def main_publisher():
     server = QuotePublisher()
 
     if 'file' in kwargs.keys():
+        
+        time.sleep(1)
 
         if 'symbol' not in kwargs.keys():
             print 'You need to specify the ticker symbol with the symbol flag in order to process this file.'
