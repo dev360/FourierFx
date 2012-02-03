@@ -21,7 +21,7 @@ import qualified Data.ByteString as SB
 import qualified Data.ByteString.UTF8 as SB
 import qualified Data.ByteString.Lazy as LB
 
-import Database.Redis.Redis (Redis, Reply, connect, lpush, set, llen, lrange, Reply (RBulk))
+import Database.Redis.Redis (Redis, Reply, connect, lpush, set, llen, lrange, Reply (RBulk), fromRMultiBulk)
 import Database.Redis.ByteStringClass (BS, toBS, fromBS)
 
 -- Quote datastructure
@@ -57,10 +57,11 @@ instance FromJSON Quote where
 
 
 getQuoteHistory :: Redis -> [Char] -> IO (Maybe (Maybe SB.ByteString))
-getQuoteHistory redis key = do
-    reply <- lrange redis (0 1001)
-    return $ case reply of 
-                  RBulk (Just r) -> Just $ decode r
+getQuoteHistory redis symbol = do
+    -- Get a thousand quotes for the symbol in question.
+    Just jsonQuotes <- lrange redis symbol (1, 1001) >>= fromRMultiBulk :: IO (Maybe [Maybe LB.ByteString])
+    return $ case jsonQuotes of 
+                  [Just r] -> Just $ decode r
                   _ -> Nothing
     
 
