@@ -94,8 +94,9 @@ def get_quotes(file_name, symbol, limit=None):
             continue
 
         quote = {}
-        quote['symbol'] = symbol
-        quote['date'] = str(datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S"))
+        quote['symbol'] = symbol            
+        date = datetime.strptime(line[0], "%Y.%m.%d %H:%M:%S")
+        quote['date'] = date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         quote['ask'] = Decimal(line[1])
         quote['bid'] = Decimal(line[2])
         quote['ask_volume'] = Decimal(line[3])
