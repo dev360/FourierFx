@@ -35,39 +35,57 @@
    $ sudo apt-get install redis
 
 
+
+
  RUNNING THE CODE
 ======================
 
-1.  Compiling and installing pre-reqs
-  
-    Run the following bash script to update Haskell requirements
+0.  Get and the data (a sample is found in the data folder).
 
-    $ cd src/qoutes
-    $ ./cabal-install.sh
+1.  Run qoute publisher server
+      
+      $ easy_install virtualenv
+      $ cd FourierFx/cfg/ && virtualenv fourierfx --no-site-packages
 
-2.  Compile:
+    Save yourself a lot of time and trouble, find your bash profile script
+    and add this alias which activates the virtualenv for you:
 
-    $ mkdir bin
-    $ ./make.sh
+      alias cd_fourierfx="cd ~/Projects/FourierFx/src/py/quotes && . ../../../cfg/fourierfx/bin/activate"
 
-3.  Run code:
+      $ cd_fourierfx
+      $ pip -E fourierfx install -r pip.requirements.txt 
+      $ cd FourierFx/src/py/
+      $ python quotes publisher --file=../../data/EURUSD_sample.csv --symbol=EURUSD --limit=100
 
-    Window 1:
-    $ ./bin/quote_publisher tcp://127.0.0.1:8000
 
-    Window 2:
-    $ ./bin/quote_subscriber tcp://127.0.0.1:8000
+2.  Run quote analyzer client
 
-    As you type in window 1, it will display in window 2.
+    Make sure you upgrade to GHC >== 7.2, it should come with Cabal.
+      
+      $ cd FourierFx/src/hs/
+      $ cabal install
+      
+   There will be a binary created in the dist folder; its usually like this:
+
+      $ FourierFx/src/hs/dist/build/fourierfx/fourierfx  tcp://127.0.0.1:6000
+
+
+3. Verifying that it worked:
+
+   You can use any redis client to verify that it works.
+
+      $ cd_fourierfx
+      $ python -c "from quotes.utils.redisdb import RedisDB as R; r = R(); print r.llen('symbol_EURUSD')"
+      $ python -c "from quotes.utils.redisdb import RedisDB as R; r = R(); print r.lrange('symbol_EURUSD', 0, 10)"
+
+4. Deleting the quotes:
+
+      $ python -c "from quotes.utils.redisdb import RedisDB as R; r = R(); r.delete('symbol_EURUSD')"
+
 
  NEXT STEPS
 ============
 
-1.  Right now, we could probably fake having a tcp/ip stream of quotes that we 
-    listen to by just piping in a big text file of historical data to the publisher.
-
-    e.g.
-    
-    cat data.txt | ./bin/quote_publisher tcp://127.0.0.1:8000
-
+  - Code that splits up Daily, hourly, and per minute data streams and initiates the corresponding computations.
+    I wrote the DatePart data structure with this in mind.
 
