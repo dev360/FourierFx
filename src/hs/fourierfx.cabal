@@ -1,0 +1,41 @@
+name:              FourierFx
+version:           0.1.0
+license:           Properietary
+license-file:      LICENSE
+author:            Christian Toivola
+maintainer:        Christian Toivola
+synopsis:          Library to analyze stock and commodity prices
+description:       Enough said.
+category:          Client/Server
+stability:         Experimental
+tested-with:       GHC == 7.2.1
+cabal-version:     >= 1.6
+build-type:        Simple
+homepage:          http://github.com/dev360/FourierFx
+
+
+
+library
+    Buildable: False
+    exposed-modules:  FourierFx.Main
+                      FourierFx.Storage
+                      FourierFx.Utils
+    hs-source-dirs: .
+
+
+executable         fourierfx
+
+    main-is:       FourierFx/Main.hs
+    hs-source-dirs: .
+
+    build-depends: base         >= 4       && < 5
+                 , aeson >= 0.6.0.0
+                 , json
+                 , time >= 1.2.0.5
+                 , bytestring >= 0.9.2.0
+                 , old-locale >= 1.0.0.3
+                 , utf8-string
+                 , redis >= 0.12
+                 , zeromq3-haskell >= 0.1.1
+
+    ghc-options:   -Wall -threaded
