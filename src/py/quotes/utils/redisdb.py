@@ -2,7 +2,11 @@ from threading import Lock
 
 import redis
 
-from .. import settings
+# Sorry but this is neccessary to get the settings imported correctly
+try:
+    from .. import settings
+except ValueError:
+    import settings
 
 
 def get_redis_pool():
