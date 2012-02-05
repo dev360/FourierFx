@@ -1,5 +1,0 @@
-aeson
-json
-utf8-string
-zeromq-haskell
-zeromq3-haskell
