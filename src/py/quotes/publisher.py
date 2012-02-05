@@ -11,6 +11,7 @@ import simplejson
 import settings
 
 from utils.unicodecsv import UnicodeReader
+from utils.redisdb import RedisDB
 from utils.zeromq import ZmqSocket
 
 
@@ -66,11 +67,16 @@ def main_publisher():
         
         time.sleep(1)
 
-        if 'symbol' not in kwargs.keys():
+        symbol = kwargs.get('symbol', '').upper()
+
+        if not symbol:
             print 'You need to specify the ticker symbol with the symbol flag in order to process this file.'
             sys.exit(2)
 
-        for quote in get_quotes(kwargs['file'], kwargs.get('symbol').upper(), kwargs.get('limit', None), ):
+        redis = RedisDB()
+        redis.sadd('symbols', symbol)
+
+        for quote in get_quotes(kwargs['file'], symbol, kwargs.get('limit', None), ):
             server.send(quote)
 
 
