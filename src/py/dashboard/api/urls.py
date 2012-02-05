@@ -3,14 +3,14 @@ from django.conf.urls.defaults import *
 
 from tastypie.api import Api
 
-from api.resources import QuotesResource
+from api.resources import SymbolResource, QuotesResource
 
 from api import views
 
 v1_api = Api(api_name='1.0')
 
-
-v1_api.register(QuotesResource())
+v1_api.register(SymbolResource())       # /symbols/
+v1_api.register(QuotesResource())       # /symbols/EURUSD/
 
 
 urlpatterns = patterns('',

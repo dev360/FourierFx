@@ -17,6 +17,11 @@ lib_path = pjoin(PROJ_ROOT, 'lib')
 if lib_path not in sys.path:
     sys.path.insert(0, lib_path)
 
+
+root_path = pjoin(PROJ_ROOT, '..')
+if root_path not in sys.path:
+    sys.path.insert(0, root_path)
+
 ADMINS = (
     ('Christian Toivola', 'c.toivola@gmail.com'),
 )
@@ -133,6 +138,8 @@ LOGIN_REDIRECT_URL = '/profile/'
 REGISTRATION_URL = '/profile/register/'
 REGISTRATION_REDIRECT_URL = '/profile/'
 LOGOUT_REDIRECT_URL = '/'
+
+API_LIMIT_PER_PAGE = 0
 
 from settingslocal import *
 
