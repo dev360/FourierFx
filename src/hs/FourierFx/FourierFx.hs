@@ -12,12 +12,39 @@ module FourierFx
         , parseQuote 
         , getSymbolQuotes
         , processQuoteString
-        , redisConnect
+        , redisConnection
+
+        , dateToString
+        , stringToDate
+        , DateParts
+        , IntervalBitMap
+        , getDateParts
+        , isNewInterval
+        , getIntervalBitMap
+        , nextYear
+        , nextMonth
+        , nextDay
     ) where
 
 
-import FourierFx.Storage (    Quote
-                            , parseQuote 
-                            , getSymbolQuotes
-                            , processQuoteString
-                            , redisConnect)
+import FourierFx.Storage (  
+          Quote
+        , parseQuote 
+        , getSymbolQuotes
+        , processQuoteString
+        , redisConnect
+    )
+
+
+import FourierFx.Utils (    
+          dateToString
+        , stringToDate
+        , DateParts
+        , IntervalBitMap
+        , getDateParts
+        , isNewInterval
+        , getIntervalBitMap
+        , nextYear
+        , nextMonth
+        , nextDay
+    )
