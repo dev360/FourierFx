@@ -24,6 +24,8 @@ module FourierFx
         , nextYear
         , nextMonth
         , nextDay
+        , nextHour
+        , nextMinute
     ) where
 
 
@@ -47,4 +49,6 @@ import FourierFx.Utils (
         , nextYear
         , nextMonth
         , nextDay
+        , nextHour
+        , nextMinute
     )

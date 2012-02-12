@@ -17,6 +17,8 @@ module FourierFx.Utils
       , nextYear
       , nextMonth
       , nextDay
+      , nextHour
+      , nextMinute
 
     ) where
 
