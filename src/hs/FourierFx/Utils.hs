@@ -69,37 +69,97 @@ data IntervalBitMap = IntervalBitMap {
 
 -- Gets the start of next year from the
 -- current date
-nextYear :: UTCTime -> UTCTime
-nextYear date = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" ( show year ++ "-1-1 00:00:00" )
-    where
-          dateParts = getDateParts $ Just date
-          year month = year dateParts + 1
+nextYear :: Maybe UTCTime -> Maybe UTCTime
+nextYear date
+    | isNothing date = Nothing
+    | isJust date = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" ( yearS' ++ "-01-01 00:00:00" ) :: Maybe UTCTime
+        where
+            dateParts = getDateParts $ date
+            year' = year dateParts + 1
+            yearS' = show year'
 
 
 -- Gets the start of next month from
 -- the current date
-nextMonth :: UTCTime -> UTCTime
-nextMonth date = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" ( show year ++ "-" ++ show month ++ "-1 00:00:00" )
-    where
-          dateParts = getDateParts $ Just date
-          year month = case month dateParts of
-                    12 -> return (year dateParts + 1) (1)
-                    _ -> return (year dateParts) (month dateParts + 1)
+nextMonth :: Maybe UTCTime -> Maybe UTCTime
+nextMonth date
+    | isNothing date = Nothing
+    | isJust date = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" ( yearS' ++ "-" ++ monthS' ++ "-01 00:00:00" ) :: Maybe UTCTime
+        where
+            dateParts = getDateParts date
+            yearS' = case (month dateParts) of
+                        12  -> show ((year dateParts) + 1)
+                        _   -> show (year dateParts)
+            
+            -- Account for idiotic trailing zeros.
+            month' = case (month dateParts) of
+                        12  -> 1
+                        _   -> (month dateParts) + 1
+
+            monthS' = case (month' < 10) of
+                        True -> "0" ++ show month'
+                        False -> show month'
 
 
 -- Gets the start of the next day from
 -- the current date
-nextDay :: UTCTime -> UTCTime
-nextDay date = UTCTime day' timeDiff'
-    where
-        -- Discard time portion to make sure its 00:00:00
-        year = read (formatTime defaultTimeLocale "%Y" $ fromJust date) :: Int
-        month = read (formatTime defaultTimeLocale "%m" $ fromJust date) :: Int
-        day = read (formatTime defaultTimeLocale "%d" $ fromJust date) :: Int
-        Just dateOnly = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" (show year ++ "-" ++ show month ++ "-" ++ show day ++" 00:00:00") :: Maybe UTCTime
-        
-        day' = addDays 1 (utctDay date)
-        timeDiff' = utctDayTime dateOnly
+nextDay :: Maybe UTCTime -> Maybe UTCTime
+nextDay date
+    | isNothing date = Nothing
+    | isJust date = Just $ UTCTime dayPart' timeDiff'
+        where
+            dayPart = utctDay $ fromJust date
+            (year', month', day') = toGregorian dayPart
+
+            yearS' = show year'
+
+            -- Account for idiotic trailing zeros.
+            monthS' = case (month' < 10) of
+                        True -> "0" ++ show month'
+                        False -> show month'
+
+            dayS' = case (day' < 10) of
+                        True -> "0" ++ show day'
+                        False -> show day'
+
+            Just dateWithoutTime = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" (yearS' ++ "-" ++ monthS' ++ "-" ++ dayS' ++ " 00:00:00") :: Maybe UTCTime
+            dayPart' = addDays 1 dayPart
+            timeDiff' = utctDayTime dateWithoutTime
+
+
+-- Gets the start of the next hour from the
+-- current date.
+nextHour :: Maybe UTCTime -> Maybe UTCTime
+nextHour date
+    | isNothing date = Nothing
+    | isJust date = date'
+        where
+            hour = read (formatTime defaultTimeLocale "%H" $ fromJust date) :: Int
+            hour' = case hour of
+                        23  -> 0
+                        _   -> hour + 1
+            
+            dayPart = utctDay $ fromJust date
+            dayPart' = case hour of
+                        23  -> addDays 1 dayPart
+                        _   -> dayPart
+            
+            (year', month', day') = toGregorian dayPart  
+            yearS' = show year'
+            -- Account for idiotic trailing zeros.
+            monthS' = case (month' < 10) of
+                        True -> "0" ++ show month'
+                        False -> show month'
+
+            dayS' = case (day' < 10) of
+                        True -> "0" ++ show day'
+                        False -> show day'
+
+            hourS' = case (hour' < 10) of
+                        True -> "0" ++ show hour'
+                        False -> show hour'
+
+            date' = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" (yearS' ++ "-" ++ monthS' ++ "-" ++ dayS' ++" "++ hourS' ++ ":00:00") :: Maybe UTCTime
 
 
 -- Gets the date parts so we can parse out 
