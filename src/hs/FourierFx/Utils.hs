@@ -162,6 +162,42 @@ nextHour date
             date' = parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" (yearS' ++ "-" ++ monthS' ++ "-" ++ dayS' ++" "++ hourS' ++ ":00:00") :: Maybe UTCTime
 
 
+nextMinute :: Maybe UTCTime -> Maybe UTCTime
+nextMinute date
+    | isNothing date = Nothing
+    | isJust date = date'
+        where
+            (year', month', day') = toGregorian $ utctDay $ fromJust date
+
+            hour' = read (formatTime defaultTimeLocale "%H" $ fromJust date) :: Int
+            minute = read (formatTime defaultTimeLocale "%M" $ fromJust date) :: Int
+            minute' = if minute == 59 then 0 else minute + 1  -- The 59 case is actually handled properly below but oh well.
+
+            yearS' = show year'
+            -- Account for idiotic trailing zeros.
+            monthS' = case (month' < 10) of
+                        True    -> "0" ++ show month'
+                        False   -> show month'
+
+            dayS' = case (day' < 10) of
+                        True    -> "0" ++ show day'
+                        False   -> show day'
+
+            hourS' = case (hour' < 10) of
+                        True    -> "0" ++ show hour'
+                        False   -> show hour'
+
+            minuteS' = case (minute' < 10) of
+                        True    -> "0" ++ show minute'
+                        False   -> show minute'
+
+            date' = case minute of
+                      59  -> nextHour date
+                      _   -> parseTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" (yearS' ++ "-" ++ monthS' ++ "-" ++ dayS' ++" "++ hourS' ++ ":"++ minuteS' ++":00") :: Maybe UTCTime
+            
+
+
+
 -- Gets the date parts so we can parse out 
 -- Year, Month, Day, Hour, Minute and Second
 getDateParts :: Maybe UTCTime -> DateParts
