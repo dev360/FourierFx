@@ -17,10 +17,9 @@ module FourierFx
         , dateToString
         , stringToDate
         , DateParts
-        , IntervalBitMap
+        , TimeSeriesMap
         , getDateParts
-        , isNewInterval
-        , getIntervalBitMap
+        , getTimeSeriesMap
         , nextYear
         , nextMonth
         , nextDay
@@ -42,10 +41,9 @@ import FourierFx.Utils (
           dateToString
         , stringToDate
         , DateParts
-        , IntervalBitMap
+        , TimeSeriesMap
         , getDateParts
-        , isNewInterval
-        , getIntervalBitMap
+        , getTimeSeriesMap
         , nextYear
         , nextMonth
         , nextDay

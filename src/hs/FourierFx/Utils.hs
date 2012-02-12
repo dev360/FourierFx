@@ -10,10 +10,9 @@ module FourierFx.Utils
         dateToString
       , stringToDate
       , DateParts
-      , IntervalBitMap
+      , TimeSeriesMap
       , getDateParts
-      , isNewInterval
-      , getIntervalBitMap
+      , getTimeSeriesMap
       , nextYear
       , nextMonth
       , nextDay
@@ -59,8 +58,8 @@ data DateParts = DateParts {
 
 --
 -- Bitmap to determine which part of a 
--- date has entered a new time interval.
-data IntervalBitMap = IntervalBitMap {
+-- date has entered a new time series.
+data TimeSeriesMap = TimeSeriesMap {
   newYear   :: Bool,
   newMonth  :: Bool,
   newDay    :: Bool,
@@ -216,24 +215,20 @@ getDateParts date
             fullDate = date
 
 
--- I wanted to curry this and pass it to a map over the interval strings,
--- but that idea didnt work out :(
-isNewInterval :: DateParts -> DateParts -> [Char] -> Bool
-isNewInterval prev new interval = True
-            
-
 
 
             
 
--- Gets the IntervalBitMap between two dates.
+-- Gets the TimeSeriesMap between two dates.
 -- 
-getIntervalBitMap :: DateParts -> DateParts -> IntervalBitMap
-getIntervalBitMap prev new = 
-    IntervalBitMap isNewYear isNewMonth isNewDay isNewHour isNewMinute
+getTimeSeriesMap :: Maybe UTCTime -> Maybe UTCTime -> TimeSeriesMap
+getTimeSeriesMap last latest
+    | isNothing last || isNothing latest = TimeSeriesMap False False False False False
+    | isJust last && isJust latest = TimeSeriesMap isNewYear isNewMonth isNewDay isNewHour isNewMinute
         where
-            isNewYear = isNewInterval prev new "year"
-            isNewMonth = isNewInterval prev new "month"
-            isNewDay = isNewInterval prev new "day"
-            isNewHour = isNewInterval prev new "hour"
-            isNewMinute = isNewInterval prev new "minute"
+            isNewYear =  fromJust latest >= fromJust (nextYear last)
+            isNewMonth = fromJust latest >= fromJust (nextMonth last) 
+            isNewDay = fromJust latest >= fromJust (nextDay last)
+            isNewHour = fromJust latest >= fromJust (nextHour last)
+            isNewMinute = fromJust latest >= fromJust (nextMinute last)
+
