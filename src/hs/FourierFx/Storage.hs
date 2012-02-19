@@ -14,6 +14,8 @@ module FourierFx.Storage
       , parseQuote 
       , getSymbolQuotes
       , processQuoteString
+      , storeQuoteInterval
+      , storeQuoteTimeSeries
       , redisConnect
     ) where
 
@@ -38,7 +40,7 @@ import Database.Redis.Redis (Redis, Reply, connect, lpush, set, llen, lrange, Re
 import Database.Redis.ByteStringClass (BS, toBS, fromBS)
 import Text.JSON.Types
 
-import FourierFx.Utils (TimeSeriesMap, getTimeSeriesMap)
+import FourierFx.Utils (TimeSeriesMap(..), getTimeSeriesMap)
 
 
 -- Quote datastructure
@@ -93,6 +95,34 @@ getSymbolQuotes redis symbol range = do
           Nothing -> return []
 
 
+storeQuoteInterval :: String -> Quote -> IO ()
+storeQuoteInterval interval quote = do
+  print quote
+
+
+storeQuoteTimeSeries :: TimeSeriesMap -> Maybe Quote -> IO ()
+storeQuoteTimeSeries timeSeries latest
+  | isNothing latest = return ()
+  | isJust latest = do
+
+      when (newYear timeSeries) $
+          storeQuoteInterval "year" $ fromJust latest
+
+      when (newMonth timeSeries) $
+          storeQuoteInterval "month" $ fromJust latest
+
+      when (newDay timeSeries) $
+          storeQuoteInterval "day" $ fromJust latest
+
+      when (newHour timeSeries) $
+          storeQuoteInterval "hour" $ fromJust latest
+
+      when (newMinute timeSeries) $
+          storeQuoteInterval "minute" $ fromJust latest
+
+      return ()
+
+
 --
 -- Takes a json string, converts it to a quote, then saves it
 -- and schedules any relevant computations that need to take place.
@@ -120,6 +150,7 @@ processQuoteString line redis = do
             -- Now get the time series map to determine what to do next.
             let timeSeries = getTimeSeriesMap (date $ fromJust last) (date $ fromJust latest)
             
+            storeQuoteTimeSeries timeSeries latest
 
             return ()
 
