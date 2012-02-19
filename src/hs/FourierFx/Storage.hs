@@ -10,7 +10,7 @@
 
 module FourierFx.Storage
     (
-        Quote
+        Quote(..)
       , parseQuote 
       , getSymbolQuotes
       , processQuoteString
@@ -37,6 +37,8 @@ import Data.Aeson
 import Database.Redis.Redis (Redis, Reply, connect, lpush, set, llen, lrange, Reply (RBulk), fromRMultiBulk)
 import Database.Redis.ByteStringClass (BS, toBS, fromBS)
 import Text.JSON.Types
+
+import FourierFx.Utils (TimeSeriesMap, getTimeSeriesMap)
 
 
 -- Quote datastructure
@@ -111,6 +113,14 @@ processQuoteString line redis = do
             --  .. we only need 10 items to work with.
             --
             history <- getSymbolQuotes redis quoteSymbol (0, 10)
+
+            let latest  = history !! 0
+            let last    = history !! 1
+
+            -- Now get the time series map to determine what to do next.
+            let timeSeries = getTimeSeriesMap (date $ fromJust last) (date $ fromJust latest)
+            
+
             return ()
 
 

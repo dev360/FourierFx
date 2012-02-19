@@ -9,8 +9,8 @@ module FourierFx.Utils
     (
         dateToString
       , stringToDate
-      , DateParts
-      , TimeSeriesMap
+      , DateParts(..)
+      , TimeSeriesMap(..)
       , getDateParts
       , getTimeSeriesMap
       , nextYear
@@ -213,14 +213,13 @@ getDateParts date
             minute = read (formatTime defaultTimeLocale "%M" $ fromJust date) :: Int
             second = read (formatTime defaultTimeLocale "%S" $ fromJust date) :: Int
             fullDate = date
-
-
-
-
-            
+        
 
 -- Gets the TimeSeriesMap between two dates.
--- 
+--   What this allows you to do is, you can determine
+--   if the new, incoming quote is part of the next
+--   interval window (year, month, day, hour, minute).
+--
 getTimeSeriesMap :: Maybe UTCTime -> Maybe UTCTime -> TimeSeriesMap
 getTimeSeriesMap last latest
     | isNothing last || isNothing latest = TimeSeriesMap False False False False False
