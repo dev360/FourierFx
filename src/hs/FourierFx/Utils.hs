@@ -46,13 +46,13 @@ dateToString date
 
 -- Date part representation
 data DateParts = DateParts {
-  year    :: Int,
-  month   :: Int,
-  day     :: Int,
-  hour    :: Int,
-  minute  :: Int,
-  second  :: Int,
-  fullDate :: Maybe UTCTime
+  year          :: Int,
+  month         :: Int,
+  day           :: Int,
+  hour          :: Int,
+  minute        :: Int,
+  second        :: Int,
+  fullDate      :: Maybe UTCTime
 } deriving (Show)
 
 
@@ -60,11 +60,11 @@ data DateParts = DateParts {
 -- Bitmap to determine which part of a 
 -- date has entered a new time series.
 data TimeSeriesMap = TimeSeriesMap {
-  newYear   :: Bool,
-  newMonth  :: Bool,
-  newDay    :: Bool,
-  newHour   :: Bool,
-  newMinute   :: Bool
+  newYear       :: Bool,
+  newMonth      :: Bool,
+  newDay        :: Bool,
+  newHour       :: Bool,
+  newMinute     :: Bool
 } deriving (Show)
 
 
